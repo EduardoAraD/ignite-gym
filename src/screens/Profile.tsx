@@ -3,6 +3,9 @@ import { Alert, TouchableOpacity } from 'react-native';
 import { Center, ScrollView, VStack, Skeleton, Text, Heading, useToast } from 'native-base';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as Yup from 'yup';
 
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
@@ -11,11 +14,36 @@ import { UserPhoto } from '@components/UserPhoto';
 
 const PHOTO_SIZE = 33;
 
+type FormDataProps = {
+  name: string;
+  password_old: string;
+  password: string;
+  password_confirm: string;
+}
+
+const signUpSchema = Yup.object({
+  name: Yup.string().required('Informe o nome.'),
+  password_old: Yup.string().required('Informe a senha antiga').min(6, 'A senha deve ter pelo menos 6 dígitos.'),
+  password: Yup.string().required('Informe a senha').min(6, 'A senha deve ter pelo menos 6 dígitos.'),
+  password_confirm: Yup.string().required('Confirme a nova senha.').
+    oneOf([Yup.ref('password')], 'A confirmação da senha não confere.')
+})
+
 export function Profile() {
   const toast = useToast();
 
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
   const [userPhoto, setUserPhoto] = useState('https://github.com/eduardoarad.png')
+
+  const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
+    defaultValues: { // valores iniciais do formulario
+      name: '',
+      password_old: '',
+      password: '',
+      password_confirm: ''
+    },
+    resolver: yupResolver(signUpSchema)
+  });
 
   async function handleUserPhotoSelect(){
     setPhotoIsLoading(true);
@@ -27,7 +55,6 @@ export function Profile() {
         allowsEditing: true,
         
       });
-      console.log(photoSelected);
 
       if(photoSelected.canceled) {
         return;
@@ -51,6 +78,10 @@ export function Profile() {
     } finally {
       setPhotoIsLoading(false);
     }
+  }
+
+  function handleSubmitProfile(data: FormDataProps) {
+    console.log(data);
   }
 
   return (
@@ -81,10 +112,20 @@ export function Profile() {
             </Text>
           </TouchableOpacity>
 
-          <Input
-            bg="gray.600"
-            placeholder='Nome'
+          <Controller
+            control={control}
+            name='name'
+            render={({ field: { onChange, value }}) => (
+              <Input
+                bg="gray.600"
+                placeholder='Nome'
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.name?.message}
+              />
+            )}
           />
+          
 
           <Input
             bg="gray.600"
@@ -94,28 +135,65 @@ export function Profile() {
           />
 
 
-          <Heading color="gray.200" fontSize="md" mb={2} mt={12} alignSelf='flex-start'>
+          <Heading
+            color="gray.200"
+            fontSize="md"
+            mb={2}
+            mt={12}
+            alignSelf='flex-start'
+            fontFamily='heading'
+          >
             Alterar senha
           </Heading>
-          <Input
-            bg="gray.600"
-            placeholder='Senha antiga'
-            secureTextEntry
+          <Controller
+            control={control}
+            name='password_old'
+            render={({ field: { onChange, value }}) => (
+              <Input
+                bg="gray.600"
+                placeholder='Senha antiga'
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.password_old?.message}
+              />
+            )}
           />
-          <Input
-            bg="gray.600"
-            placeholder='Nova senha'
-            secureTextEntry
+
+          <Controller
+            control={control}
+            name='password'
+            render={({ field: { onChange, value }}) => (
+              <Input
+                bg="gray.600"
+                placeholder='Informe a nova senha'
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.password?.message}
+              />
+            )}
           />
-          <Input
-            bg="gray.600"
-            placeholder='Confirme nova senha'
-            secureTextEntry
+
+          <Controller
+            control={control}
+            name='password_confirm'
+            render={({ field: { onChange, value }}) => (
+              <Input
+                bg="gray.600"
+                placeholder='Confirme nova senha'
+                secureTextEntry
+                onChangeText={onChange}
+                value={value}
+                errorMessage={errors.password_confirm?.message}
+              />
+            )}
           />
 
           <Button
             title='Atualizar'
             mt={4}
+            onPress={handleSubmit(handleSubmitProfile)}
           />
         </Center>
       </ScrollView>
