@@ -3,7 +3,6 @@ import { Input as NativeBaseInput, IInputProps } from 'native-base';
 export function Input ({...rest}: IInputProps) {
   return (
     <NativeBaseInput
-      {...rest}
       bg='gray.700'
       h={14}
       px={4}
@@ -18,6 +17,7 @@ export function Input ({...rest}: IInputProps) {
         borderColor: 'green.500',
       }}
       mb={4}
+      {...rest}
     />
   )
 }
