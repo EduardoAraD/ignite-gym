@@ -13,6 +13,8 @@ import { AppError } from '@utils/AppError';
 
 import BackgroundImg from '@assets/background.png';
 import LogoSVG from '@assets/logo.svg';
+import { useState } from 'react';
+import { useAuth } from '@hooks/useAuth';
 
 type FormDataProps = {
   name: string;
@@ -32,6 +34,9 @@ const signUpSchema = Yup.object({
 export function SignUp() {
   const navigation = useNavigation();
   const toast = useToast();
+  const { signIn } = useAuth();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
     resolver: yupResolver(signUpSchema)
@@ -43,14 +48,18 @@ export function SignUp() {
 
   async function handleSignUp({ email, name, password}: FormDataProps) {
     try {
-      const response = await api.post('/users', {
+      setIsLoading(true);
+
+      await api.post('/users', {
         name,
         email,
         password,
-      })
+      });
   
-      console.log(response.data);
+      await signIn(email, password);
+
     } catch(error) {
+      setIsLoading(false);
       const isAppError = error instanceof AppError;
       const title = isAppError ? error.message : 'Não foi possível criar a conta. Tente novamente mais tarde.'
 
@@ -59,7 +68,6 @@ export function SignUp() {
         placement: 'top',
         bgColor: 'red.500',
       })
-
     }
   }
 
@@ -152,6 +160,7 @@ export function SignUp() {
 
           <Button
             title='Criar e acessar'
+            isLoading={isLoading}
             onPress={handleSubmit(handleSignUp)}
           />
         </Center>

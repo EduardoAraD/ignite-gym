@@ -1,16 +1,21 @@
-import { VStack, Image, Text, Center, Heading, ScrollView } from 'native-base';
+import { VStack, Image, Text, Center, Heading, ScrollView, useToast } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as Yup from 'yup';
+
+import { useAuth } from '@hooks/useAuth';
 
 import { AuthNavigatorRoutesProps } from '@routes/auth.routes';
 
 import { Button } from '@components/Button';
 import { Input } from '@components/Input';
 
+import { AppError } from '@utils/AppError';
+
 import BackgroundImg from '@assets/background.png';
 import LogoSVG from '@assets/logo.svg';
+import { useState } from 'react';
 
 type FormDataProps = {
   email: string;
@@ -24,6 +29,10 @@ const signUpSchema = Yup.object({
 
 export function SignIn() {
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
+  const { signIn } = useAuth();
+  const toast = useToast();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>({
     resolver: yupResolver(signUpSchema)
@@ -33,8 +42,24 @@ export function SignIn() {
     navigation.navigate('signUp');
   }
 
-  function handleSubmitSignIn(data: FormDataProps) {
-    console.log(data);
+  async function handleSubmitSignIn(data: FormDataProps) {
+    try {
+      setIsLoading(true);
+      await signIn(data.email, data.password);
+
+    } catch(error) {
+      const isAppError = error instanceof AppError;
+      
+      const title = isAppError ? error.message : 'Não foi possível entrar. Tente novamente mais tarde.'
+      
+      setIsLoading(false);
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500',
+      })
+    }
+    
   }
 
   return (
@@ -98,6 +123,7 @@ export function SignIn() {
           <Button
             title='Acessar'
             onPress={handleSubmit(handleSubmitSignIn)}
+            isLoading={isLoading}
           />
         </Center>
       
