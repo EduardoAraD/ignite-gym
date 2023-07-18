@@ -18,6 +18,8 @@ import { api } from '@services/api';
 
 import { AppError } from '@utils/AppError';
 
+import defaultUserPhotoImg from '@assets/userPhotoDefault.png';
+
 const PHOTO_SIZE = 33;
 
 type FormDataProps = {
@@ -63,14 +65,14 @@ export function Profile() {
 
   const [isUpdating, setIsUpdating] = useState(false);
   const [photoIsLoading, setPhotoIsLoading] = useState(false);
-  const [userPhoto, setUserPhoto] = useState('https://github.com/eduardoarad.png')
 
   async function handleUserPhotoSelect(){
-    setPhotoIsLoading(true);
     try {
+      setPhotoIsLoading(true);
+
       const photoSelected = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 1,
+        quality: 0.8,
         aspect: [4, 4],
         allowsEditing: true,
       });
@@ -90,10 +92,43 @@ export function Profile() {
           });
         }
           
-        setUserPhoto(photoSelected.assets[0].uri);
+        // setUserPhoto(photoSelected.assets[0].uri);
+        const fileExtension = photoSelected.assets[0].uri.split('.').pop();
+        const photoFile = {
+          name: `${user.name}.${fileExtension}`.toLowerCase().replace(/\s/g, ''),
+          uri: photoSelected.assets[0].uri,
+          type: `${photoSelected.assets[0].type}/${fileExtension}`,
+        } as any;
+        
+        const userPhotoUploadForm = new FormData();
+        userPhotoUploadForm.append('avatar', photoFile);
+
+        const avatarUptadedResponse = await api.patch('/users/avatar', userPhotoUploadForm, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        });
+
+        const userUpteded = user;
+        userUpteded.avatar = avatarUptadedResponse.data.avatar;
+
+        updateUserProfile(userUpteded);
+
+        toast.show({
+          title: 'Foto atualizada',
+          placement: 'top',
+          bgColor: 'green.500',
+        })
       }
-    } catch(err) {
-      console.log('Error Photo', err);
+    } catch(error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError ? error.message : 'Não foi possível atualizar a foto.'
+
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500',
+      })
     } finally {
       setPhotoIsLoading(false);
     }
@@ -145,7 +180,11 @@ export function Profile() {
             />
           ) : (
             <UserPhoto
-              source={{ uri: userPhoto }}
+              source={
+                user.avatar ?
+                  { uri: `${api.defaults.baseURL}/avatar/${user.avatar}` } :
+                  defaultUserPhotoImg
+              }
               alt='Foto do usuário'
               size={PHOTO_SIZE}
             />
