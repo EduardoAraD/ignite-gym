@@ -2,7 +2,7 @@ import { Platform } from 'react-native'
 import { createBottomTabNavigator, BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useTheme } from 'native-base';
 
-import { Exercise } from '@screens/Exercise';
+import { Exercise, ExerciseRouteParams } from '@screens/Exercise';
 import { History } from '@screens/History';
 import { Home } from '@screens/Home';
 import { Profile } from '@screens/Profile';
@@ -13,7 +13,7 @@ import ProfileSvg from '@assets/profile.svg';
 
 type AppRoutes = {
   home: undefined;
-  exercise: undefined;
+  exercise: ExerciseRouteParams;
   profile: undefined;
   history: undefined;
 }
