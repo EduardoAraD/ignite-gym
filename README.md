@@ -10,6 +10,9 @@ Nesta aplicação foram feitos Context do React, Async Storage, Token JWT, Refre
 Esse projeto é um dos desafios da trilha de React Native do curso **Ignite**, bootcamp completo de especialização em React, React Native e Node.js
 realizado pela [Rocketseat](https://www.rocketseat.com.br "Site da Rockeseat").
 
+## API
+https://github.com/rocketseat-education/ignite-rn-2022-challenge-marketspace-api
+
 # Layout
 ## Figma
 Foi utilizado este layout para a aplicação.
