@@ -11,7 +11,7 @@ Esse projeto é um dos desafios da trilha de React Native do curso **Ignite**, b
 realizado pela [Rocketseat](https://www.rocketseat.com.br "Site da Rockeseat").
 
 ## API
-https://github.com/rocketseat-education/ignite-rn-2022-challenge-marketspace-api
+https://github.com/EduardoAraD/ignitegym-api
 
 # Layout
 ## Figma
