@@ -15,6 +15,8 @@ import { ExerciseDTO } from '@dtos/Exercise.DTO';
 
 import { AppError } from '@utils/AppError';
 
+import { tagLastDayExercise } from '../notifications/tags';
+
 import BodySvg from '@assets/body.svg';
 import SerieSvg from '@assets/series.svg';
 import RepetitionSvg from '@assets/repetitions.svg';
@@ -64,6 +66,8 @@ export function Exercise() {
 
       await api.post('/history', { exercise_id: exerciseId });
 
+      tagLastDayExercise();
+      
       toast.show({
         title: 'Parabéns! Exercício registrado no seu histórico',
         placement: 'top',

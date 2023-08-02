@@ -12,11 +12,26 @@ import { HistoryByDayDTO } from '@dtos/HistoryByDayDTO';
 
 import { AppError } from '@utils/AppError';
 
+import { tagNumberExerciseHistoryInWeek } from '../notifications/tags';
+
 export function History() {
   const toast = useToast();
 
   const [isLoading, setIsLoading] = useState(true);
   const [exercises, setExercises] = useState<HistoryByDayDTO[]>([]);
+
+  function getLast7Days() {
+    const numberLast7Day = new Date().setDate(new Date().getDate() - 7);
+    const date7Day = new Date(numberLast7Day);
+    const day = date7Day.getDate();
+    const month = date7Day.getMonth() + 1;
+    return `${day <= 9 ? `0${day}` : day}.${month <= 9 ? `0${month}` : month}.${date7Day.getFullYear()}`;
+  }
+
+  function dateInNumberComparate(date: string) {
+    const [day, month, year] = date.split('.');
+    return Number(`${year}${month}${day}`);
+  }
 
   async function fetchHistory() {
     try {
@@ -24,7 +39,19 @@ export function History() {
 
       const response = await api.get('/history');
 
-      setExercises(response.data);
+      const historyDate: HistoryByDayDTO[] = response.data;
+
+      const numberDateLastWeek = dateInNumberComparate(getLast7Days());
+      let numberExercicesInWeek = 0;
+      historyDate.forEach(history => {
+        const numberDateExercise = dateInNumberComparate(history.title);
+        if(numberDateExercise > numberDateLastWeek) {
+          numberExercicesInWeek += history.data.length;
+        }
+      })
+      tagNumberExerciseHistoryInWeek(numberExercicesInWeek)
+
+      setExercises(historyDate);
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError ? error.message : 'Não foi possível carregar o histórico.'

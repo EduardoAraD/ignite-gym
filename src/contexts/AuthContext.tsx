@@ -7,6 +7,8 @@ import { UserDTO } from "@dtos/UserDTO";
 import { storageUserSave, storageUserGet, storageUserRemove } from "@storage/storageUser";
 import { storageAuthTokenSave, storageAuthTokenGet, storageAuthTokenRemove } from '@storage/storageAuthToken';
 
+import { createTagsUser, removeTagUser } from "../notifications/tags";
+
 export type AuthContextDataProps = {
   user: UserDTO;
   isLoadingUserStorageData: boolean;
@@ -53,6 +55,8 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
         await storageUserAndTokenSave(data.user, data.token, data.refresh_token);
         
         userAndTokenUpdate(data.user, data.token);
+
+        createTagsUser(data.user.name);
       }
     } catch (error) {
       throw error;
@@ -71,6 +75,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   async function signOut() {
     try {
       setIsLoadingUserStorageData(true);
+      removeTagUser();
 
       setUser({} as UserDTO);
       await storageUserRemove()

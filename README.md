@@ -7,6 +7,8 @@
 
 Nesta aplicação foram feitos Context do React, Async Storage, Token JWT, Refresh Token, Navegação Bottom Tabs e Stack.
 
+Notificações e DeepLink
+
 Esse projeto é um dos desafios da trilha de React Native do curso **Ignite**, bootcamp completo de especialização em React, React Native e Node.js
 realizado pela [Rocketseat](https://www.rocketseat.com.br "Site da Rockeseat").
 
@@ -48,3 +50,4 @@ Carlos Eduardo Araújo Duarte
 
 https://www.linkedin.com/in/eduardo-araujo-2a679a176/
 
+<!-- npx uri-scheme open ignitegym://history --android -->

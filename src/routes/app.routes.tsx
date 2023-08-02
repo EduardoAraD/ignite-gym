@@ -5,6 +5,7 @@ import { useTheme } from 'native-base';
 import { Exercise, ExerciseRouteParams } from '@screens/Exercise';
 import { History } from '@screens/History';
 import { Home } from '@screens/Home';
+import { NotFound } from '@screens/NotFound';
 import { Profile } from '@screens/Profile';
 
 import HomeSvg from '@assets/home.svg';
@@ -16,6 +17,7 @@ type AppRoutes = {
   exercise: ExerciseRouteParams;
   profile: undefined;
   history: undefined;
+  NotFound: undefined;
 }
 
 export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRoutes>;
@@ -74,6 +76,13 @@ export function AppRoutes() {
       <Screen
         name='exercise'
         component={Exercise}
+        options={{
+          tabBarButton: () => null
+        }}
+      />
+      <Screen
+        name='NotFound'
+        component={NotFound}
         options={{
           tabBarButton: () => null
         }}
